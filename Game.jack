@@ -1,0 +1,170 @@
+class Game {
+    field int SQUARE_WIDTH, GAP_WIDTH, BOARD_WIDTH;
+
+    field int N;
+    field Array board;
+    field int playerX;
+    field int playerY;
+    field int score;
+
+    static int EMPTY_CELL, PLAYER, SP_ITEM, POINT, NORMAL_BLOCK, STABLE_BLOCK;
+    // 0 - empty cell
+    // 1 - player
+    // 2 - a special item
+    // 3 - a point
+    // 4 - a normal block
+    // 5 - a stable block
+    constructor Game new(int N_) {
+        let N = N_;
+        let board = Array.new(N * N);
+        let SQUARE_WIDTH = 40;
+        let GAP_WIDTH = 5;
+        let BOARD_WIDTH = (N * SQUARE_WIDTH) + ((N + 1) * GAP_WIDTH);
+
+        let EMPTY_CELL = 0;
+        let PLAYER = 1;
+        let SP_ITEM = 2;
+        let POINT = 3;
+        let NORMAL_BLOCK = 4;
+        let STABLE_BLOCK = 5;
+
+        return this;
+    }
+
+    method boolean ended() {
+        // var int x, y;
+        return false;
+    }
+
+    method boolean isInBoard(int x, int y) {
+        return (~(x < 0)) & (x < N) & (~(y < 0)) & (y < N);
+    }
+
+    method boolean move(int dx, int dy) {
+        var int x, y;
+        var int foundX, foundY;
+        var int point;
+        var int normal_block;
+        var boolean found;
+        let x = playerX + dx;
+        let y = playerY + dy;
+        let point = 0;
+        let normal_block = 0;
+        let found = false;
+        while ((~found) & isInBoard(x, y)) {
+            if (board[(x * N) + y] = POINT) {
+                let point = point + 1;
+            }
+            if (board[(x * N) + y] = STABLE_BLOCK) {
+                let found = true;
+                let wx = x;
+                let wy = y;
+            }
+            let x = x + dx;
+            let y = y + dy;
+        }
+        // TODO
+        if (~found) {
+            let wx = x;
+            let wy = y;
+        }
+        return false;
+    }
+
+    // TODO: method void trigger_item;
+
+    method void init() {
+        var int i, pos;
+        let i = 0;
+        while (i < (N * N)) {
+            let board[i] = EMPTY_CELL;
+            let i = i + 1;
+        }
+        let i = 0;
+        while (i < N) {
+            let pos = Random.next(N * N);
+            while (~(board[pos] = EMPTY_CELL)) {
+                let pos = Random.next(N * N);
+            }
+            let board[pos] = NORMAL_BLOCK;
+            let i = i + 1;
+        }
+        let pos = Random.next(N * N);
+        while (~(board[pos] = EMPTY_CELL)) {
+            let pos = Random.next(N * N);
+        }
+        let board[pos] = PLAYER;
+        let playerX = pos / N;
+        let playerY = pos - (playerX * N);
+        let score = 0;
+        return;
+    }
+
+    method void draw() {
+        var int x, y, i;
+        do Screen.clearScreen();
+        do Screen.drawLine(0, 0, BOARD_WIDTH, 0);
+        do Screen.drawLine(0, 0, 0, BOARD_WIDTH);
+        do Screen.drawLine(BOARD_WIDTH, 0, BOARD_WIDTH, BOARD_WIDTH);
+        do Screen.drawLine(0, BOARD_WIDTH, BOARD_WIDTH, BOARD_WIDTH);
+        let i = 0;
+        while (i < (N * N)) {
+            let x = i / N;
+            let y = i - (x * N);
+            let x = (x * (SQUARE_WIDTH + GAP_WIDTH)) + GAP_WIDTH;
+            let y = (y * (SQUARE_WIDTH + GAP_WIDTH)) + GAP_WIDTH;
+            do Game.drawCell(board[i], x, y, SQUARE_WIDTH);
+            let i = i + 1;
+        }
+        return;
+    }
+
+    method void dispose() {
+        do board.dispose();
+        return;
+    }
+
+    function void drawCell(int type, int x, int y, int size) {
+        var int r, w;
+        let r = size / 2;
+        let w = 2;
+        // 0 - empty cell
+        // 1 - player
+        // 2 - a special item
+        // 3 - a point
+        // 4 - a normal block
+        // 5 - a stable block
+        if (type = 0) {
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x, y, x + size, y + size);
+        }
+        if (type = 1) {
+            do Screen.setColor(true);
+            do Screen.drawCircle(x + r, y + r, r);
+        }
+        if (type = 2) {
+            do Screen.setColor(true);
+            do Screen.drawCircle(x + r, y + r, r);
+            do Screen.setColor(false);
+            do Screen.drawCircle(x + r, y + r, r - w);
+        }
+        if (type = 3) {
+            do Screen.setColor(true);
+            do Screen.drawCircle(x + r, y + r, w);
+        }
+        if (type = 4) {
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x, y, x + size, y + size);
+        }
+        if (type = 5) {
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x, y, x + size, y + size);
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x + w, y + w, x + size - w, y + size - w);
+            do Screen.setColor(true);
+            do Screen.drawLine(x, y, x + size, y + size);
+            do Screen.drawLine(x + size, y, x, y + size);
+        }
+        return;
+    }
+}

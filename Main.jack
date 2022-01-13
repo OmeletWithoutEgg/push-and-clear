@@ -1,0 +1,34 @@
+class Main {
+    function void main () {
+        var Game game;
+        var boolean moved;
+
+        let game = Game.new(5);
+
+        do Random.init();
+        do game.init();
+
+        while (~game.ended()) {
+            // do game.draw();
+            let direction = -1;
+            let moved = false;
+            // 130 ~ 133, LURD
+            if (~(direction = -1)) {
+                let moved = game.move(direction, direction);
+            }
+            // if (moved) {
+            //     do game.generateNewBlock();
+            // }
+        }
+        // while (userCanMove()) {
+        //     printBoard();
+        //     waitNextStep();
+        //     performNextStep();
+        //     generateBlock();
+        // }
+
+        do game.dispose();
+        return;
+    }
+
+}

@@ -1,0 +1,23 @@
+class Random {
+    static int K, mod;
+    function void init() {
+        let K = 49;
+        let mod = 173;
+        return;
+    }
+    function int gen() {
+        let K = (K * 31);
+        let K = K - (K / 173 * 173);
+        return K;
+    }
+    function int next(int range) {
+        var int up, res;
+        let up = mod / range * range;
+        let res = up;
+        while (~(res < up)) {
+            let res = Random.gen();
+        }
+        let res = res - (res / range * range);
+        return res;
+    }
+}
