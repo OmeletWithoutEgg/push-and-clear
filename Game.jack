@@ -5,7 +5,7 @@ class Game {
     field Array board;
     field int playerX;
     field int playerY;
-    field int score;
+    field int total_point;
 
     static int EMPTY_CELL, PLAYER, SP_ITEM, POINT, NORMAL_BLOCK, STABLE_BLOCK;
     // 0 - empty cell
@@ -41,34 +41,61 @@ class Game {
     }
 
     method boolean move(int dx, int dy) {
-        var int x, y;
-        var int foundX, foundY;
+        var int x, y, id;
+        var int tx, ty;
         var int point;
         var int normal_block;
-        var boolean found;
+        var boolean found, moved;
         let x = playerX + dx;
         let y = playerY + dy;
         let point = 0;
         let normal_block = 0;
         let found = false;
         while ((~found) & isInBoard(x, y)) {
-            if (board[(x * N) + y] = POINT) {
-                let point = point + 1;
-            }
-            if (board[(x * N) + y] = STABLE_BLOCK) {
+            let id = (x * N) + y;
+            if (board[id] = STABLE_BLOCK) {
                 let found = true;
-                let wx = x;
-                let wy = y;
+            } else {
+                if (board[id] = POINT) {
+                    let point = point + 1;
+                }
+                if (board[id] = NORMAL_BLOCK) {
+                    let normal_block = normal_block + 1;
+                }
+                let x = x + dx;
+                let y = y + dy;
             }
-            let x = x + dx;
-            let y = y + dy;
         }
-        // TODO
-        if (~found) {
-            let wx = x;
-            let wy = y;
+        // board[x, y] now is out of map or is a stable block
+        let tx = x;
+        let ty = y;
+        let x = tx;
+        let y = ty;
+        while (~((x = playerX) & (y = playerY))) {
+            let x = x - dx;
+            let y = y - dy;
+            let id = (x * N) + y;
+            let board[id] = EMPTY_CELL;
         }
-        return false;
+        let x = tx;
+        let y = ty;
+        while (normal_block > 0) {
+            let x = x - dx;
+            let y = y - dy;
+            let id = (x * N) + y;
+            let board[id] = NORMAL_BLOCK;
+            let normal_block = normal_block - 1;
+        }
+        let x = x - dx;
+        let y = y - dy;
+        let id = (x * N) + y;
+        let board[id] = PLAYER;
+        let moved = ~((playerX = x) & (playerY = y));
+        let playerX = x;
+        let playerY = y;
+
+        let total_point = total_point + point;
+        return moved;
     }
 
     // TODO: method void trigger_item;
@@ -96,7 +123,7 @@ class Game {
         let board[pos] = PLAYER;
         let playerX = pos / N;
         let playerY = pos - (playerX * N);
-        let score = 0;
+        let total_point = 0;
         return;
     }
 
@@ -128,35 +155,29 @@ class Game {
         var int r, w;
         let r = size / 2;
         let w = 2;
-        // 0 - empty cell
-        // 1 - player
-        // 2 - a special item
-        // 3 - a point
-        // 4 - a normal block
-        // 5 - a stable block
-        if (type = 0) {
+        if (type = EMPTY_CELL) {
             do Screen.setColor(false);
             do Screen.drawRectangle(x, y, x + size, y + size);
         }
-        if (type = 1) {
+        if (type = PLAYER) {
             do Screen.setColor(true);
             do Screen.drawCircle(x + r, y + r, r);
         }
-        if (type = 2) {
+        if (type = SP_ITEM) {
             do Screen.setColor(true);
             do Screen.drawCircle(x + r, y + r, r);
             do Screen.setColor(false);
             do Screen.drawCircle(x + r, y + r, r - w);
         }
-        if (type = 3) {
+        if (type = POINT) {
             do Screen.setColor(true);
             do Screen.drawCircle(x + r, y + r, w);
         }
-        if (type = 4) {
+        if (type = NORMAL_BLOCK) {
             do Screen.setColor(true);
             do Screen.drawRectangle(x, y, x + size, y + size);
         }
-        if (type = 5) {
+        if (type = STABLE_BLOCK) {
             do Screen.setColor(true);
             do Screen.drawRectangle(x, y, x + size, y + size);
             do Screen.setColor(false);
