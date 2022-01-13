@@ -2,14 +2,14 @@ class Main {
     function int readOperation() {
         var int ch;
         let ch = Keyboard.readChar();
-        do Output.moveCursor(0, 0);
+        do Output.backSpace();
         if ((ch = 130)) { return 0; }
         if ((ch = 131)) { return 1; }
         if ((ch = 132)) { return 2; }
         if ((ch = 133)) { return 3; }
         return -1;
     }
-    function void main () {
+    function void main() {
         var Game game;
         var int direction, dx, dy;
         var boolean moved;
@@ -19,8 +19,8 @@ class Main {
         do Random.init();
         do game.init();
 
+        do game.draw();
         while (~game.ended()) {
-            do game.draw();
             let direction = Main.readOperation();
             let moved = false;
             if (direction = 0) {
@@ -42,9 +42,9 @@ class Main {
             if (~(direction = -1)) {
                 let moved = game.move(dx, dy);
             }
-            // if (moved) {
-            //     do game.generateNewBlock();
-            // }
+            if (moved) {
+                do game.generateNewBlock();
+            }
         }
         // while (userCanMove()) {
         //     printBoard();

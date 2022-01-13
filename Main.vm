@@ -1,9 +1,7 @@
 function Main.readOperation 1
 call Keyboard.readChar 0
 pop local 0
-push constant 0
-push constant 0
-call Output.moveCursor 2
+call Output.backSpace 0
 pop temp 0
 push local 0
 push constant 130
@@ -53,15 +51,15 @@ pop temp 0
 push local 0
 call Game.init 1
 pop temp 0
+push local 0
+call Game.draw 1
+pop temp 0
 label WHILE_EXP0
 push local 0
 call Game.ended 1
 not
 not
 if-goto WHILE_END0
-push local 0
-call Game.draw 1
-pop temp 0
 call Main.readOperation 0
 pop local 1
 push constant 0
@@ -126,6 +124,14 @@ push local 3
 call Game.move 3
 pop local 4
 label IF_FALSE4
+push local 4
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
+push local 0
+call Game.generateNewBlock 1
+pop temp 0
+label IF_FALSE5
 goto WHILE_EXP0
 label WHILE_END0
 push local 0

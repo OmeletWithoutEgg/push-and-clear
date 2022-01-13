@@ -1,5 +1,6 @@
 class Game {
     field int SQUARE_WIDTH, GAP_WIDTH, BOARD_WIDTH;
+    field int OFFSET_X, OFFSET_Y;
 
     field int N;
     field Array board;
@@ -20,6 +21,8 @@ class Game {
         let SQUARE_WIDTH = 40;
         let GAP_WIDTH = 5;
         let BOARD_WIDTH = (N * SQUARE_WIDTH) + ((N + 1) * GAP_WIDTH);
+        let OFFSET_X = (512 / 2) - (BOARD_WIDTH / 2);
+        let OFFSET_Y = (256 / 2) - (BOARD_WIDTH / 2);
 
         let EMPTY_CELL = 0;
         let PLAYER = 1;
@@ -38,6 +41,14 @@ class Game {
 
     method boolean isInBoard(int x, int y) {
         return (~(x < 0)) & (x < N) & (~(y < 0)) & (y < N);
+    }
+
+    method void setBoard(int id, int x, int y, int type) {
+        let board[id] = type;
+        let x = (x * (SQUARE_WIDTH + GAP_WIDTH)) + GAP_WIDTH;
+        let y = (y * (SQUARE_WIDTH + GAP_WIDTH)) + GAP_WIDTH;
+        do Game.drawCell(type, x + OFFSET_X, y + OFFSET_Y, SQUARE_WIDTH);
+        return;
     }
 
     method boolean move(int dx, int dy) {
@@ -75,7 +86,7 @@ class Game {
             let x = x - dx;
             let y = y - dy;
             let id = (x * N) + y;
-            let board[id] = EMPTY_CELL;
+            do setBoard(id, x, y, EMPTY_CELL);
         }
         let x = tx;
         let y = ty;
@@ -83,19 +94,104 @@ class Game {
             let x = x - dx;
             let y = y - dy;
             let id = (x * N) + y;
-            let board[id] = NORMAL_BLOCK;
+            do setBoard(id, x, y, NORMAL_BLOCK);
             let normal_block = normal_block - 1;
         }
         let x = x - dx;
         let y = y - dy;
         let id = (x * N) + y;
-        let board[id] = PLAYER;
+        do setBoard(id, x, y, PLAYER);
         let moved = ~((playerX = x) & (playerY = y));
         let playerX = x;
         let playerY = y;
 
         let total_point = total_point + point;
+
+        do elimination();
+        do Output.moveCursor(0, 0);
+        do Output.printInt(total_point);
         return moved;
+    }
+
+    method void generateNewBlock() {
+        var int pos, x, y;
+        let pos = Random.next(N * N);
+        while (~((board[pos] = EMPTY_CELL) | (board[pos] = POINT))) {
+            let pos = Random.next(N * N);
+        }
+        let x = pos / N;
+        let y = pos - (x * N);
+        do setBoard(pos, x, y, NORMAL_BLOCK);
+        do elimination();
+        return;
+    }
+
+    method void elimination() {
+        var Array bingo;
+        var int i, j, id;
+        var boolean flag;
+        let bingo = Array.new(N * N);
+        let id = 0;
+        while (id < (N * N)) {
+            let bingo[id] = false;
+            let id = id + 1;
+        }
+        let i = 0;
+        while (i < N) {
+            // vertical
+            let j = 0;
+            let flag = true;
+            while (j < N) {
+                let id = (i * N) + j;
+                if (~((board[id] = NORMAL_BLOCK) | (board[id] = STABLE_BLOCK))) {
+                    let flag = false;
+                }
+                let j = j + 1;
+            }
+            if (flag) {
+                let j = 0;
+                while (j < N) {
+                    let id = (i * N) + j;
+                    let bingo[id] = true;
+                    let j = j + 1;
+                }
+            }
+            // horizontal
+            let j = 0;
+            let flag = true;
+            while (j < N) {
+                let id = (j * N) + i;
+                if (~((board[id] = NORMAL_BLOCK) | (board[id] = STABLE_BLOCK))) {
+                    let flag = false;
+                }
+                let j = j + 1;
+            }
+            if (flag) {
+                let j = 0;
+                while (j < N) {
+                    let id = (j * N) + i;
+                    let bingo[id] = true;
+                    let j = j + 1;
+                }
+            }
+            let i = i + 1;
+        }
+        let id = 0;
+        while (id < (N * N)) {
+            if (bingo[id]) {
+                let i = id / N;
+                let j = id - (i * N);
+                if (board[id] = NORMAL_BLOCK) {
+                    // let board[id] = POINT;
+                    do setBoard(id, i, j, POINT);
+                } else {
+                    // let board[id] = SP_ITEM;
+                }
+            }
+            let id = id + 1;
+        }
+        do bingo.dispose();
+        return;
     }
 
     // TODO: method void trigger_item;
@@ -109,11 +205,7 @@ class Game {
         }
         let i = 0;
         while (i < N) {
-            let pos = Random.next(N * N);
-            while (~(board[pos] = EMPTY_CELL)) {
-                let pos = Random.next(N * N);
-            }
-            let board[pos] = NORMAL_BLOCK;
+            do generateNewBlock();
             let i = i + 1;
         }
         let pos = Random.next(N * N);
@@ -130,19 +222,21 @@ class Game {
     method void draw() {
         var int x, y, i;
         do Screen.clearScreen();
-        do Screen.drawLine(0, 0, BOARD_WIDTH, 0);
-        do Screen.drawLine(0, 0, 0, BOARD_WIDTH);
-        do Screen.drawLine(BOARD_WIDTH, 0, BOARD_WIDTH, BOARD_WIDTH);
-        do Screen.drawLine(0, BOARD_WIDTH, BOARD_WIDTH, BOARD_WIDTH);
+        do Screen.drawLine(0 + OFFSET_X, 0 + OFFSET_Y, BOARD_WIDTH + OFFSET_X, 0 + OFFSET_Y);
+        do Screen.drawLine(0 + OFFSET_X, 0 + OFFSET_Y, 0 + OFFSET_X, BOARD_WIDTH + OFFSET_Y);
+        do Screen.drawLine(BOARD_WIDTH + OFFSET_X, 0 + OFFSET_Y, BOARD_WIDTH + OFFSET_X, BOARD_WIDTH + OFFSET_Y);
+        do Screen.drawLine(0 + OFFSET_X, BOARD_WIDTH + OFFSET_Y, BOARD_WIDTH + OFFSET_X, BOARD_WIDTH + OFFSET_Y);
         let i = 0;
         while (i < (N * N)) {
             let x = i / N;
             let y = i - (x * N);
             let x = (x * (SQUARE_WIDTH + GAP_WIDTH)) + GAP_WIDTH;
             let y = (y * (SQUARE_WIDTH + GAP_WIDTH)) + GAP_WIDTH;
-            do Game.drawCell(board[i], x, y, SQUARE_WIDTH);
+            do Game.drawCell(board[i], x + OFFSET_X, y + OFFSET_Y, SQUARE_WIDTH);
             let i = i + 1;
         }
+        do Output.moveCursor(0, 0);
+        do Output.printInt(total_point);
         return;
     }
 
@@ -155,10 +249,10 @@ class Game {
         var int r, w;
         let r = size / 2;
         let w = 2;
-        if (type = EMPTY_CELL) {
-            do Screen.setColor(false);
-            do Screen.drawRectangle(x, y, x + size, y + size);
-        }
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x, y, x + size, y + size);
+        // if (type = EMPTY_CELL) {
+        // }
         if (type = PLAYER) {
             do Screen.setColor(true);
             do Screen.drawCircle(x + r, y + r, r);
