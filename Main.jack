@@ -40,12 +40,15 @@ class Main {
                 let dy = 1;
             }
             if (~(direction = -1)) {
-                let moved = game.move(dx, dy);
+                let moved = game.move(dx, dy, true);
             }
             if (moved) {
                 do game.generateNewBlock();
             }
         }
+        do game.draw();
+        do Output.moveCursor(0, 25);
+        do Output.printString("game over!");
         // while (userCanMove()) {
         //     printBoard();
         //     waitNextStep();

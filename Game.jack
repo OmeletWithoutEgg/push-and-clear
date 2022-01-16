@@ -4,9 +4,11 @@ class Game {
 
     field int N;
     field Array board;
+
+    field int step;
     field int playerX;
     field int playerY;
-    field int total_point;
+    field int totalPoint;
 
     static int EMPTY_CELL, PLAYER, SP_ITEM, POINT, NORMAL_BLOCK, STABLE_BLOCK;
     // 0 - empty cell
@@ -35,8 +37,7 @@ class Game {
     }
 
     method boolean ended() {
-        // var int x, y;
-        return false;
+        return ~(move(-1, 0, false) | move(1, 0, false) | move(0, -1, false) | move(0, 1, false));
     }
 
     method boolean isInBoard(int x, int y) {
@@ -51,15 +52,16 @@ class Game {
         return;
     }
 
-    method boolean move(int dx, int dy) {
+    method boolean move(int dx, int dy, boolean really_move) {
         var int x, y, id;
         var int tx, ty;
-        var int point;
-        var int normal_block;
+        var int empty, point, sp_item, normal_block;
         var boolean found, moved;
         let x = playerX + dx;
         let y = playerY + dy;
+        let empty = 0;
         let point = 0;
+        let sp_item = 0;
         let normal_block = 0;
         let found = false;
         while ((~found) & isInBoard(x, y)) {
@@ -67,8 +69,14 @@ class Game {
             if (board[id] = STABLE_BLOCK) {
                 let found = true;
             } else {
+                if (board[id] = EMPTY_CELL) {
+                    let empty = empty + 1;
+                }
                 if (board[id] = POINT) {
                     let point = point + 1;
+                }
+                if (board[id] = SP_ITEM) {
+                    let sp_item = sp_item + 1;
                 }
                 if (board[id] = NORMAL_BLOCK) {
                     let normal_block = normal_block + 1;
@@ -76,6 +84,9 @@ class Game {
                 let x = x + dx;
                 let y = y + dy;
             }
+        }
+        if (~really_move) {
+            return ~((empty + point + sp_item) = 0);
         }
         // board[x, y] now is out of map or is a stable block
         let tx = x;
@@ -105,32 +116,53 @@ class Game {
         let playerX = x;
         let playerY = y;
 
-        let total_point = total_point + point;
+        let totalPoint = totalPoint + point;
 
-        do elimination();
+        do elimination(true);
         do Output.moveCursor(0, 0);
-        do Output.printInt(total_point);
+        do Output.printInt(totalPoint);
+
+        if (moved) {
+            let step = step + 1;
+        }
         return moved;
     }
 
     method void generateNewBlock() {
         var int pos, x, y;
-        let pos = Random.next(N * N);
-        while (~((board[pos] = EMPTY_CELL) | (board[pos] = POINT))) {
+        var int iter, org;
+        var boolean flag;
+        let iter = 0;
+        let flag = true;
+        while ((iter < 3) & flag) {
+            // try 3 times, if no elimination, break.
             let pos = Random.next(N * N);
+            while (~((board[pos] = EMPTY_CELL) | (board[pos] = POINT))) {
+                let pos = Random.next(N * N);
+            }
+            let org = board[pos];
+            let x = pos / N;
+            let y = pos - (x * N);
+            let board[pos] = NORMAL_BLOCK;
+            let flag = elimination(false);
+            let iter = iter + 1;
+            let board[pos] = org;
         }
-        let x = pos / N;
-        let y = pos - (x * N);
-        do setBoard(pos, x, y, NORMAL_BLOCK);
-        do elimination();
+        if (Random.next(100) < (Math.sqrt(step * 100))) {
+            do setBoard(pos, x, y, STABLE_BLOCK);
+        } else {
+            do setBoard(pos, x, y, NORMAL_BLOCK);
+        }
+        do elimination(true);
         return;
     }
 
-    method void elimination() {
+    method boolean elimination(bool really_elimination) {
         var Array bingo;
         var int i, j, id;
-        var boolean flag;
+        var boolean flag, hasBingo;
         let bingo = Array.new(N * N);
+        let hasBingo = false;
         let id = 0;
         while (id < (N * N)) {
             let bingo[id] = false;
@@ -153,6 +185,7 @@ class Game {
                 while (j < N) {
                     let id = (i * N) + j;
                     let bingo[id] = true;
+                    let hasBingo = true;
                     let j = j + 1;
                 }
             }
@@ -171,10 +204,21 @@ class Game {
                 while (j < N) {
                     let id = (j * N) + i;
                     let bingo[id] = true;
+                    let hasBingo = true;
                     let j = j + 1;
                 }
             }
             let i = i + 1;
+        }
+        if (~really_elimination) {
+            return hasBingo;
+        }
+        if (hasBingo) {
+            do Output.moveCursor(0, 25);
+            do Output.printString("line clear!");
+            do Sys.wait(500);
+            do Output.moveCursor(0, 25);
+            do Output.printString("           ");
         }
         let id = 0;
         while (id < (N * N)) {
@@ -182,16 +226,16 @@ class Game {
                 let i = id / N;
                 let j = id - (i * N);
                 if (board[id] = NORMAL_BLOCK) {
-                    // let board[id] = POINT;
                     do setBoard(id, i, j, POINT);
                 } else {
+                    do setBoard(id, i, j, POINT);
                     // let board[id] = SP_ITEM;
                 }
             }
             let id = id + 1;
         }
         do bingo.dispose();
-        return;
+        return hasBingo;
     }
 
     // TODO: method void trigger_item;
@@ -215,7 +259,8 @@ class Game {
         let board[pos] = PLAYER;
         let playerX = pos / N;
         let playerY = pos - (playerX * N);
-        let total_point = 0;
+        let totalPoint = 0;
+        let step = 0;
         return;
     }
 
@@ -236,7 +281,7 @@ class Game {
             let i = i + 1;
         }
         do Output.moveCursor(0, 0);
-        do Output.printInt(total_point);
+        do Output.printInt(totalPoint);
         return;
     }
 
