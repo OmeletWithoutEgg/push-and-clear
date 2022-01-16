@@ -14,7 +14,7 @@ class Main {
         var int direction, dx, dy;
         var boolean moved;
 
-        let game = Game.new(5);
+        let game = Game.new(6);
 
         do Random.init();
         do game.init();

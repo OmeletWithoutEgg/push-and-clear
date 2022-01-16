@@ -20,7 +20,7 @@ class Game {
     constructor Game new(int N_) {
         let N = N_;
         let board = Array.new(N * N);
-        let SQUARE_WIDTH = 40;
+        let SQUARE_WIDTH = 30;
         let GAP_WIDTH = 5;
         let BOARD_WIDTH = (N * SQUARE_WIDTH) + ((N + 1) * GAP_WIDTH);
         let OFFSET_X = (512 / 2) - (BOARD_WIDTH / 2);
@@ -148,7 +148,7 @@ class Game {
             let iter = iter + 1;
             let board[pos] = org;
         }
-        if (Random.next(100) < (Math.sqrt(step * 100))) {
+        if (Random.next(100) < (Math.sqrt(step * 100) / 3)) {
             do setBoard(pos, x, y, STABLE_BLOCK);
         } else {
             do setBoard(pos, x, y, NORMAL_BLOCK);
