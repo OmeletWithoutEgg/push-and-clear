@@ -52,7 +52,7 @@ class Game {
         return;
     }
 
-    method boolean move(int dx, int dy, boolean really_move) {
+    method boolean move(int dx, int dy, boolean apply) {
         var int x, y, id;
         var int tx, ty;
         var int empty, point, sp_item, normal_block;
@@ -85,7 +85,7 @@ class Game {
                 let y = y + dy;
             }
         }
-        if (~really_move) {
+        if (~apply) {
             return ~((empty + point + sp_item) = 0);
         }
         // board[x, y] now is out of map or is a stable block
@@ -157,7 +157,7 @@ class Game {
         return;
     }
 
-    method boolean elimination(bool really_elimination) {
+    method boolean elimination(bool apply) {
         var Array bingo;
         var int i, j, id;
         var boolean flag, hasBingo;
@@ -210,7 +210,7 @@ class Game {
             }
             let i = i + 1;
         }
-        if (~really_elimination) {
+        if (~apply) {
             return hasBingo;
         }
         if (hasBingo) {
