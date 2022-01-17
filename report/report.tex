@@ -416,4 +416,129 @@ method boolean elimination(bool apply) {
     return hasBingo;
 }
       \end{lstlisting}
+    \subsubsection{$\texttt{generateNewBlock()}$}
+      隨機在空白位置生成新箱子，且有$\frac{10\sqrt{steps}}{3}$的機率是固定箱子。為降低自動生成馬上造成消除的可能，生成箱子的位置一旦造成消除，便會重新選擇一個，至多重複三次。而為了避免自動生成固定箱子馬上困住玩家導致遊戲結束，若在選定的位置放置固定箱子後會導致遊戲結束，便以一般的箱子取代之。
+      \begin{lstlisting}[language=Java, frame=single]
+method void generateNewBlock() {
+    var int pos, x, y;
+    var int iter, org;
+    var boolean flag;
+    let iter = 0;
+    let flag = true;
+    while ((iter < 3) & flag) {
+        // try 3 times, if no elimination, break.
+        let pos = Random.next(N * N);
+        while (~((board[pos] = EMPTY_CELL) | (board[pos] = POINT))) {
+            let pos = Random.next(N * N);
+        }
+        let org = board[pos];
+        let x = pos / N;
+        let y = pos - (x * N);
+        let board[pos] = NORMAL_BLOCK;
+        let flag = elimination(false);
+        let iter = iter + 1;
+        let board[pos] = org;
+    }
+    if (Random.next(100) < (Math.sqrt(step * 100) / 3)) {
+        do setBoard(pos, x, y, STABLE_BLOCK);
+        if (ended()) {
+            do setBoard(pos, x, y, NORMAL_BLOCK);
+        }
+    } else {
+        do setBoard(pos, x, y, NORMAL_BLOCK);
+    }
+    do elimination(true);
+    return;
+}
+      \end{lstlisting}
+    \subsubsection{$\texttt{generateNewBlock()}$}
+      初始化fields，並隨機放置六個一般箱子與玩家位置。
+      \begin{lstlisting}[language=Java, frame=single]
+method void init() {
+    var int i, pos;
+    let i = 0;
+    while (i < (N * N)) {
+        let board[i] = EMPTY_CELL;
+        let i = i + 1;
+    }
+    let i = 0;
+    while (i < N) {
+        do generateNewBlock();
+        let i = i + 1;
+    }
+    let pos = Random.next(N * N);
+    while (~(board[pos] = EMPTY_CELL)) {
+        let pos = Random.next(N * N);
+    }
+    let board[pos] = PLAYER;
+    let playerX = pos / N;
+    let playerY = pos - (playerX * N);
+    let totalPoint = 0;
+    let step = 0;
+    return;
+}
+      \end{lstlisting}
+
+  \subsection{主函數（Main.jack）}
+    初始化、主迴圈（輸入$\then{}$移動$\then{}$生成$\then{}$顯示）
+    \begin{lstlisting}[language=Java, frame=single]
+class Main {
+    function int readOperation() {
+        var int ch;
+        let ch = Keyboard.readChar();
+        do Output.backSpace();
+        if ((ch = 130)) { return 0; }
+        if ((ch = 131)) { return 1; }
+        if ((ch = 132)) { return 2; }
+        if ((ch = 133)) { return 3; }
+        return -1;
+    }
+    function void main() {
+        var Game game;
+        var int direction, dx, dy;
+        var boolean moved;
+
+        let game = Game.new(6);
+
+        do Random.init();
+        do game.init();
+
+        do game.draw();
+        while (~game.ended()) {
+            let direction = Main.readOperation();
+            let moved = false;
+            if (direction = 0) {
+                let dx = -1;
+                let dy = 0;
+            }
+            if (direction = 1) {
+                let dx = 0;
+                let dy = -1;
+            }
+            if (direction = 2) {
+                let dx = 1;
+                let dy = 0;
+            }
+            if (direction = 3) {
+                let dx = 0;
+                let dy = 1;
+            }
+            if (~(direction = -1)) {
+                let moved = game.move(dx, dy, true);
+            }
+            if (moved) {
+                do game.generateNewBlock();
+            }
+        }
+        do game.draw();
+        do Output.moveCursor(0, 25);
+        do Output.printString("game over!");
+
+        do game.dispose();
+        return;
+    }
+
+}
+    \end{lstlisting}
+
 \end{document}
