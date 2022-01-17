@@ -150,6 +150,9 @@ class Game {
         }
         if (Random.next(100) < (Math.sqrt(step * 100) / 3)) {
             do setBoard(pos, x, y, STABLE_BLOCK);
+            if (ended()) {
+                do setBoard(pos, x, y, NORMAL_BLOCK);
+            }
         } else {
             do setBoard(pos, x, y, NORMAL_BLOCK);
         }
