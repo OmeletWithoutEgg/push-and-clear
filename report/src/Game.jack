@@ -1,0 +1,330 @@
+class Game {
+    field int SQUARE_WIDTH, GAP_WIDTH, BOARD_WIDTH;
+    field int OFFSET_X, OFFSET_Y;
+
+    field int N;
+    field Array board;
+
+    field int step;
+    field int playerX;
+    field int playerY;
+    field int totalPoint;
+
+    static int EMPTY_CELL, PLAYER, SP_ITEM, POINT, NORMAL_BLOCK, STABLE_BLOCK;
+    // 0 - empty cell
+    // 1 - player
+    // 2 - a special item
+    // 3 - a point
+    // 4 - a normal block
+    // 5 - a stable block
+    constructor Game new(int N_) {
+        let N = N_;
+        let board = Array.new(N * N);
+        let SQUARE_WIDTH = 30;
+        let GAP_WIDTH = 5;
+        let BOARD_WIDTH = (N * SQUARE_WIDTH) + ((N + 1) * GAP_WIDTH);
+        let OFFSET_X = (512 / 2) - (BOARD_WIDTH / 2);
+        let OFFSET_Y = (256 / 2) - (BOARD_WIDTH / 2);
+
+        let EMPTY_CELL = 0;
+        let PLAYER = 1;
+        let SP_ITEM = 2;
+        let POINT = 3;
+        let NORMAL_BLOCK = 4;
+        let STABLE_BLOCK = 5;
+
+        return this;
+    }
+
+    method boolean ended() {
+        return ~(move(-1, 0, false) | move(1, 0, false) | move(0, -1, false) | move(0, 1, false));
+    }
+
+    method boolean isInBoard(int x, int y) {
+        return (~(x < 0)) & (x < N) & (~(y < 0)) & (y < N);
+    }
+
+    method void setBoard(int id, int x, int y, int type) {
+        let board[id] = type;
+        let x = (x * (SQUARE_WIDTH + GAP_WIDTH)) + GAP_WIDTH;
+        let y = (y * (SQUARE_WIDTH + GAP_WIDTH)) + GAP_WIDTH;
+        do Game.drawCell(type, x + OFFSET_X, y + OFFSET_Y, SQUARE_WIDTH);
+        return;
+    }
+
+    method boolean move(int dx, int dy, boolean really_move) {
+        var int x, y, id;
+        var int tx, ty;
+        var int empty, point, sp_item, normal_block;
+        var boolean found, moved;
+        let x = playerX + dx;
+        let y = playerY + dy;
+        let empty = 0;
+        let point = 0;
+        let sp_item = 0;
+        let normal_block = 0;
+        let found = false;
+        while ((~found) & isInBoard(x, y)) {
+            let id = (x * N) + y;
+            if (board[id] = STABLE_BLOCK) {
+                let found = true;
+            } else {
+                if (board[id] = EMPTY_CELL) {
+                    let empty = empty + 1;
+                }
+                if (board[id] = POINT) {
+                    let point = point + 1;
+                }
+                if (board[id] = SP_ITEM) {
+                    let sp_item = sp_item + 1;
+                }
+                if (board[id] = NORMAL_BLOCK) {
+                    let normal_block = normal_block + 1;
+                }
+                let x = x + dx;
+                let y = y + dy;
+            }
+        }
+        if (~really_move) {
+            return ~((empty + point + sp_item) = 0);
+        }
+        // board[x, y] now is out of map or is a stable block
+        let tx = x;
+        let ty = y;
+        let x = tx;
+        let y = ty;
+        while (~((x = playerX) & (y = playerY))) {
+            let x = x - dx;
+            let y = y - dy;
+            let id = (x * N) + y;
+            do setBoard(id, x, y, EMPTY_CELL);
+        }
+        let x = tx;
+        let y = ty;
+        while (normal_block > 0) {
+            let x = x - dx;
+            let y = y - dy;
+            let id = (x * N) + y;
+            do setBoard(id, x, y, NORMAL_BLOCK);
+            let normal_block = normal_block - 1;
+        }
+        let x = x - dx;
+        let y = y - dy;
+        let id = (x * N) + y;
+        do setBoard(id, x, y, PLAYER);
+        let moved = ~((playerX = x) & (playerY = y));
+        let playerX = x;
+        let playerY = y;
+
+        let totalPoint = totalPoint + point;
+
+        do elimination(true);
+        do Output.moveCursor(0, 0);
+        do Output.printInt(totalPoint);
+
+        if (moved) {
+            let step = step + 1;
+        }
+        return moved;
+    }
+
+    method void generateNewBlock() {
+        var int pos, x, y;
+        var int iter, org;
+        var boolean flag;
+        let iter = 0;
+        let flag = true;
+        while ((iter < 3) & flag) {
+            // try 3 times, if no elimination, break.
+            let pos = Random.next(N * N);
+            while (~((board[pos] = EMPTY_CELL) | (board[pos] = POINT))) {
+                let pos = Random.next(N * N);
+            }
+            let org = board[pos];
+            let x = pos / N;
+            let y = pos - (x * N);
+            let board[pos] = NORMAL_BLOCK;
+            let flag = elimination(false);
+            let iter = iter + 1;
+            let board[pos] = org;
+        }
+        if (Random.next(100) < (Math.sqrt(step * 100) / 3)) {
+            do setBoard(pos, x, y, STABLE_BLOCK);
+        } else {
+            do setBoard(pos, x, y, NORMAL_BLOCK);
+        }
+        do elimination(true);
+        return;
+    }
+
+    method boolean elimination(bool really_elimination) {
+        var Array bingo;
+        var int i, j, id;
+        var boolean flag, hasBingo;
+        let bingo = Array.new(N * N);
+        let hasBingo = false;
+        let id = 0;
+        while (id < (N * N)) {
+            let bingo[id] = false;
+            let id = id + 1;
+        }
+        let i = 0;
+        while (i < N) {
+            // vertical
+            let j = 0;
+            let flag = true;
+            while (j < N) {
+                let id = (i * N) + j;
+                if (~((board[id] = NORMAL_BLOCK) | (board[id] = STABLE_BLOCK))) {
+                    let flag = false;
+                }
+                let j = j + 1;
+            }
+            if (flag) {
+                let j = 0;
+                while (j < N) {
+                    let id = (i * N) + j;
+                    let bingo[id] = true;
+                    let hasBingo = true;
+                    let j = j + 1;
+                }
+            }
+            // horizontal
+            let j = 0;
+            let flag = true;
+            while (j < N) {
+                let id = (j * N) + i;
+                if (~((board[id] = NORMAL_BLOCK) | (board[id] = STABLE_BLOCK))) {
+                    let flag = false;
+                }
+                let j = j + 1;
+            }
+            if (flag) {
+                let j = 0;
+                while (j < N) {
+                    let id = (j * N) + i;
+                    let bingo[id] = true;
+                    let hasBingo = true;
+                    let j = j + 1;
+                }
+            }
+            let i = i + 1;
+        }
+        if (~really_elimination) {
+            return hasBingo;
+        }
+        if (hasBingo) {
+            do Output.moveCursor(0, 25);
+            do Output.printString("line clear!");
+            do Sys.wait(500);
+            do Output.moveCursor(0, 25);
+            do Output.printString("           ");
+        }
+        let id = 0;
+        while (id < (N * N)) {
+            if (bingo[id]) {
+                let i = id / N;
+                let j = id - (i * N);
+                if (board[id] = NORMAL_BLOCK) {
+                    do setBoard(id, i, j, POINT);
+                } else {
+                    do setBoard(id, i, j, POINT);
+                    // let board[id] = SP_ITEM;
+                }
+            }
+            let id = id + 1;
+        }
+        do bingo.dispose();
+        return hasBingo;
+    }
+
+    // TODO: method void trigger_item;
+
+    method void init() {
+        var int i, pos;
+        let i = 0;
+        while (i < (N * N)) {
+            let board[i] = EMPTY_CELL;
+            let i = i + 1;
+        }
+        let i = 0;
+        while (i < N) {
+            do generateNewBlock();
+            let i = i + 1;
+        }
+        let pos = Random.next(N * N);
+        while (~(board[pos] = EMPTY_CELL)) {
+            let pos = Random.next(N * N);
+        }
+        let board[pos] = PLAYER;
+        let playerX = pos / N;
+        let playerY = pos - (playerX * N);
+        let totalPoint = 0;
+        let step = 0;
+        return;
+    }
+
+    method void draw() {
+        var int x, y, i;
+        do Screen.clearScreen();
+        do Screen.drawLine(0 + OFFSET_X, 0 + OFFSET_Y, BOARD_WIDTH + OFFSET_X, 0 + OFFSET_Y);
+        do Screen.drawLine(0 + OFFSET_X, 0 + OFFSET_Y, 0 + OFFSET_X, BOARD_WIDTH + OFFSET_Y);
+        do Screen.drawLine(BOARD_WIDTH + OFFSET_X, 0 + OFFSET_Y, BOARD_WIDTH + OFFSET_X, BOARD_WIDTH + OFFSET_Y);
+        do Screen.drawLine(0 + OFFSET_X, BOARD_WIDTH + OFFSET_Y, BOARD_WIDTH + OFFSET_X, BOARD_WIDTH + OFFSET_Y);
+        let i = 0;
+        while (i < (N * N)) {
+            let x = i / N;
+            let y = i - (x * N);
+            let x = (x * (SQUARE_WIDTH + GAP_WIDTH)) + GAP_WIDTH;
+            let y = (y * (SQUARE_WIDTH + GAP_WIDTH)) + GAP_WIDTH;
+            do Game.drawCell(board[i], x + OFFSET_X, y + OFFSET_Y, SQUARE_WIDTH);
+            let i = i + 1;
+        }
+        do Output.moveCursor(0, 0);
+        do Output.printInt(totalPoint);
+        return;
+    }
+
+    method void dispose() {
+        do board.dispose();
+        return;
+    }
+
+    function void drawCell(int type, int x, int y, int size) {
+        var int r, w;
+        let r = size / 2;
+        let w = 2;
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x, y, x + size, y + size);
+        // if (type = EMPTY_CELL) {
+        // }
+        if (type = PLAYER) {
+            do Screen.setColor(true);
+            do Screen.drawCircle(x + r, y + r, r);
+        }
+        if (type = SP_ITEM) {
+            do Screen.setColor(true);
+            do Screen.drawCircle(x + r, y + r, r);
+            do Screen.setColor(false);
+            do Screen.drawCircle(x + r, y + r, r - w);
+        }
+        if (type = POINT) {
+            do Screen.setColor(true);
+            do Screen.drawCircle(x + r, y + r, w);
+        }
+        if (type = NORMAL_BLOCK) {
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x, y, x + size, y + size);
+        }
+        if (type = STABLE_BLOCK) {
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x, y, x + size, y + size);
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x + w, y + w, x + size - w, y + size - w);
+            do Screen.setColor(true);
+            do Screen.drawLine(x, y, x + size, y + size);
+            do Screen.drawLine(x + size, y, x, y + size);
+        }
+        return;
+    }
+}

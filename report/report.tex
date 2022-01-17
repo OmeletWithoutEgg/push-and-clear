@@ -1,0 +1,160 @@
+\documentclass[pstricks, 12pt, a4paper]{article}
+
+\usepackage{fontspec}
+\usepackage{type1cm}
+\usepackage[margin=3cm]{geometry}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{yhmath}
+\usepackage{graphicx}
+\graphicspath{ {./img/} }
+\usepackage[usenames, dvipsnames]{color}
+\usepackage[unicode=true, bookmarksdepth=-1]{hyperref}
+\usepackage{tabularx}
+\usepackage{enumerate}
+\usepackage{lastpage}
+\usepackage[inline]{enumitem}
+\usepackage{esvect}
+\usepackage{siunitx}
+\usepackage{listings}
+
+\usepackage{xeCJK}
+\setCJKmainfont[AutoFakeBold=3,AutoFakeSlant=.4]{Noto Sans TC}
+% \setCJKmainfont[AutoFakeBold=3,AutoFakeSlant=.4]{標楷體}
+
+\XeTeXlinebreaklocale "zh"
+\XeTeXlinebreakskip = 0pt plus 1pt
+
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{titling}
+\usepackage{lastpage}
+\setlength{\headheight}{15pt}
+\setlength{\droptitle}{-1.5cm}
+
+\usepackage{multirow} % table content
+
+\usepackage{pst-plot} % drawing
+\psset{algebraic}
+
+\usepackage{qtree}
+
+\fancypagestyle{std}{
+  \fancyhead[L]{}
+  \fancyhead[C]{}
+  \fancyhead[R]{計算機概論}
+  \fancyfoot[L]{B109020xx 林秉軒、B10902028 王\ 勻}
+  \fancyfoot[C]{}
+  \fancyfoot[R]{Page \thepage\ of \pageref{LastPage}}
+  \renewcommand{\headrulewidth}{0.4pt}
+  \renewcommand{\footrulewidth}{0.4pt}
+}
+\pagestyle{std}
+\titleformat{\chapter}[block]
+  {\thispagestyle{std}\normalfont\huge\bfseries\centering}{\thechapter.}{1em}{\Huge}
+\titlespacing*{\chapter}{0pt}{-19pt}{0pt}
+
+\renewcommand{\baselinestretch}{1.3}
+
+\title{Final Project --- Push and Clear}
+\author{林秉軒、王\ 勻}
+\date{\today}
+
+\newcounter{problem}
+\newcounter{subproblem}
+\newcounter{solution}
+
+\newcommand{\Problem}[1]{
+  {\subsection*{Problem #1}}
+}
+
+\newcommand{\Solution}[1]{
+  {\subsection*{Solution #1:}}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% START
+\renewcommand{\bold}[1]{{\boldmath\bfseries#1}}
+\renewcommand{\vec}[1]{\vv{#1}}
+\renewcommand{\inf}{\infty}
+\renewcommand{\Ref}[1]{\textbf{\ref{#1}}}
+\newcommand{\thus}{\ \Rightarrow\ }
+\newcommand{\then}[2][]{\xrightarrow[#1]{#2}}
+\newcommand{\suchthat}{\text{ s.t. }}
+\newcommand{\bigbar}{\Bigr|}
+\newcommand{\contradict}{\rightarrow\!\leftarrow}
+\newcommand{\set}[1]{\left\{#1\right\}}
+
+\newcommand{\block}[3][]{
+  \begin{#2}[#1]
+    #3
+  \end{#2}
+}
+\makeatletter
+\renewcommand*\env@matrix[1][*\c@MaxMatrixCols c]{%
+  \hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{#1}}
+\renewcommand{\matrix}[2][*\c@MaxMatrixCols c]{
+  \begin{bmatrix}[#1]
+    #2
+  \end{bmatrix}
+}
+\newcommand{\resize}[2][1]{\resizebox{#1\textwidth}{!}{#2}}
+\newcommand{\inv}[1]{{#1^{-1}}}
+
+\newcommand{\Unit}[2]{\qty[per-mode=symbol, parse-numbers=false]{#1}{#2}}
+\newcommand{\Umps}[1]{\Unit{#1}{\metre\per\s}}
+\newcommand{\Ucmps}[1]{\Unit{#1}{\metre\per\s}}
+\newcommand{\Um}[1]{\Unit{#1}{\metre}}
+\newcommand{\Us}[1]{\Unit{#1}{\s}}
+\newcommand{\Umpss}[1]{\Unit{#1}{\metre\per\s\squared}}
+\newcommand{\Ukg}[1]{\Unit{#1}{\kilogram}}
+\newcommand{\UN}[1]{\Unit{#1}{\newton}}
+\newcommand{\Uradps}[1]{\Unit{#1}{\radian\per\s}}
+\newcommand{\UMeV}[1]{\Unit{#1}{\mega\eV}}
+\newcommand{\UC}[1]{\Unit{#1}{\coulomb}}
+\newcommand{\UE}[1]{\Unit{#1}{\newton\per\coulomb}}
+\newcommand{\UV}[1]{\Unit{#1}{\volt}}
+\newcommand{\UW}[1]{\Unit{#1}{\watt}}
+\newcommand{\UR}[1]{\Unit{#1}{\ohm}}
+\newcommand{\UF}[1]{\Unit{#1}{\farad}}
+\newcommand{\UT}[1]{\Unit{#1}{\tesla}}
+\newcommand{\UJ}[1]{\Unit{#1}{\joule}}
+\newcommand{\UA}[1]{\Unit{#1}{\ampere}}
+\newcommand{\UHz}[1]{\Unit{#1}{\hertz}}
+\newcommand{\half}{\frac{1}{2}}
+\newcommand{\inc}{\uparrow}
+\newcommand{\dec}{\downarrow}
+
+\lstdefinestyle{vivid}{
+  basicstyle={\small\ttfamily}
+}
+\lstset{style=vivid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END
+\usepackage{indentfirst}
+\parindent 2em
+\parskip 1em
+
+\begin{document}
+
+\maketitle
+
+\thispagestyle{std}
+
+\section{遊戲規則介紹}
+在$6\times 6$的盤面中
+
+\section{程式碼}
+\begin{lstlisting}[language=Java]
+function int readOperation() {
+    var int ch;
+    let ch = Keyboard.readChar();
+    do Output.backSpace();
+    if ((ch = 130)) { return 0; }
+    if ((ch = 131)) { return 1; }
+    if ((ch = 132)) { return 2; }
+    if ((ch = 133)) { return 3; }
+    return -1;
+}
+\end{lstlisting}
+
+\end{document}

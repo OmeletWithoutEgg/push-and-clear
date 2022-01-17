@@ -1,0 +1,52 @@
+function Random.init 0
+push constant 49
+pop static 0
+push constant 173
+pop static 1
+push constant 0
+return
+function Random.gen 0
+push static 0
+push constant 31
+call Math.multiply 2
+pop static 0
+push static 0
+push static 0
+push constant 173
+call Math.divide 2
+push constant 173
+call Math.multiply 2
+sub
+pop static 0
+push static 0
+return
+function Random.next 2
+push static 1
+push argument 0
+call Math.divide 2
+push argument 0
+call Math.multiply 2
+pop local 0
+push local 0
+pop local 1
+label WHILE_EXP0
+push local 1
+push local 0
+lt
+not
+not
+if-goto WHILE_END0
+call Random.gen 0
+pop local 1
+goto WHILE_EXP0
+label WHILE_END0
+push local 1
+push local 1
+push argument 0
+call Math.divide 2
+push argument 0
+call Math.multiply 2
+sub
+pop local 1
+push local 1
+return

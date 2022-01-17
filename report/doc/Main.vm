@@ -1,0 +1,174 @@
+function Main.readOperation 1
+call Keyboard.readChar 0
+pop local 0
+call Output.backSpace 0
+pop temp 0
+push local 0
+push constant 130
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+return
+label IF_FALSE0
+push local 0
+push constant 131
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 1
+return
+label IF_FALSE1
+push local 0
+push constant 132
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push constant 2
+return
+label IF_FALSE2
+push local 0
+push constant 133
+eq
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push constant 3
+return
+label IF_FALSE3
+push constant 1
+neg
+return
+function Main.main 5
+push constant 6
+call Game.new 1
+pop local 0
+call Random.init 0
+pop temp 0
+push local 0
+call Game.init 1
+pop temp 0
+push local 0
+call Game.draw 1
+pop temp 0
+label WHILE_EXP0
+push local 0
+call Game.ended 1
+not
+not
+if-goto WHILE_END0
+call Main.readOperation 0
+pop local 1
+push constant 0
+pop local 4
+push local 1
+push constant 0
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 1
+neg
+pop local 2
+push constant 0
+pop local 3
+label IF_FALSE0
+push local 1
+push constant 1
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 0
+pop local 2
+push constant 1
+neg
+pop local 3
+label IF_FALSE1
+push local 1
+push constant 2
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push constant 1
+pop local 2
+push constant 0
+pop local 3
+label IF_FALSE2
+push local 1
+push constant 3
+eq
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push constant 0
+pop local 2
+push constant 1
+pop local 3
+label IF_FALSE3
+push local 1
+push constant 1
+neg
+eq
+not
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push local 0
+push local 2
+push local 3
+push constant 0
+not
+call Game.move 4
+pop local 4
+label IF_FALSE4
+push local 4
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
+push local 0
+call Game.generateNewBlock 1
+pop temp 0
+label IF_FALSE5
+goto WHILE_EXP0
+label WHILE_END0
+push local 0
+call Game.draw 1
+pop temp 0
+push constant 0
+push constant 25
+call Output.moveCursor 2
+pop temp 0
+push constant 10
+call String.new 1
+push constant 103
+call String.appendChar 2
+push constant 97
+call String.appendChar 2
+push constant 109
+call String.appendChar 2
+push constant 101
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 111
+call String.appendChar 2
+push constant 118
+call String.appendChar 2
+push constant 101
+call String.appendChar 2
+push constant 114
+call String.appendChar 2
+push constant 33
+call String.appendChar 2
+call Output.printString 1
+pop temp 0
+push local 0
+call Game.dispose 1
+pop temp 0
+push constant 0
+return

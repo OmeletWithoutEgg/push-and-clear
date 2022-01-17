@@ -1,0 +1,63 @@
+class Main {
+    function int readOperation() {
+        var int ch;
+        let ch = Keyboard.readChar();
+        do Output.backSpace();
+        if ((ch = 130)) { return 0; }
+        if ((ch = 131)) { return 1; }
+        if ((ch = 132)) { return 2; }
+        if ((ch = 133)) { return 3; }
+        return -1;
+    }
+    function void main() {
+        var Game game;
+        var int direction, dx, dy;
+        var boolean moved;
+
+        let game = Game.new(6);
+
+        do Random.init();
+        do game.init();
+
+        do game.draw();
+        while (~game.ended()) {
+            let direction = Main.readOperation();
+            let moved = false;
+            if (direction = 0) {
+                let dx = -1;
+                let dy = 0;
+            }
+            if (direction = 1) {
+                let dx = 0;
+                let dy = -1;
+            }
+            if (direction = 2) {
+                let dx = 1;
+                let dy = 0;
+            }
+            if (direction = 3) {
+                let dx = 0;
+                let dy = 1;
+            }
+            if (~(direction = -1)) {
+                let moved = game.move(dx, dy, true);
+            }
+            if (moved) {
+                do game.generateNewBlock();
+            }
+        }
+        do game.draw();
+        do Output.moveCursor(0, 25);
+        do Output.printString("game over!");
+        // while (userCanMove()) {
+        //     printBoard();
+        //     waitNextStep();
+        //     performNextStep();
+        //     generateBlock();
+        // }
+
+        do game.dispose();
+        return;
+    }
+
+}
