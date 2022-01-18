@@ -49,8 +49,6 @@ push constant 3
 pop static 3
 push constant 4
 pop static 4
-push constant 5
-pop static 5
 push pointer 0
 return
 function Game.ended 0
@@ -143,7 +141,7 @@ call Game.drawCell 4
 pop temp 0
 push constant 0
 return
-function Game.move 11
+function Game.move 10
 push argument 0
 pop pointer 0
 push this 8
@@ -162,10 +160,8 @@ push constant 0
 pop local 7
 push constant 0
 pop local 8
-push constant 0
-pop local 9
 label WHILE_EXP0
-push local 9
+push local 8
 not
 push pointer 0
 push local 0
@@ -185,14 +181,14 @@ push this 6
 add
 pop pointer 1
 push that 0
-push static 5
+push static 4
 eq
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
 push constant 0
 not
-pop local 9
+pop local 8
 goto IF_END0
 label IF_FALSE0
 push local 2
@@ -215,7 +211,7 @@ push this 6
 add
 pop pointer 1
 push that 0
-push static 3
+push static 2
 eq
 if-goto IF_TRUE2
 goto IF_FALSE2
@@ -230,7 +226,7 @@ push this 6
 add
 pop pointer 1
 push that 0
-push static 2
+push static 3
 eq
 if-goto IF_TRUE3
 goto IF_FALSE3
@@ -240,21 +236,6 @@ push constant 1
 add
 pop local 7
 label IF_FALSE3
-push local 2
-push this 6
-add
-pop pointer 1
-push that 0
-push static 4
-eq
-if-goto IF_TRUE4
-goto IF_FALSE4
-label IF_TRUE4
-push local 8
-push constant 1
-add
-pop local 8
-label IF_FALSE4
 push local 0
 push argument 1
 add
@@ -268,19 +249,17 @@ goto WHILE_EXP0
 label WHILE_END0
 push argument 3
 not
-if-goto IF_TRUE5
-goto IF_FALSE5
-label IF_TRUE5
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
 push local 5
 push local 6
-add
-push local 7
 add
 push constant 0
 eq
 not
 return
-label IF_FALSE5
+label IF_FALSE4
 push local 0
 pop local 3
 push local 1
@@ -328,7 +307,7 @@ pop local 0
 push local 4
 pop local 1
 label WHILE_EXP2
-push local 8
+push local 7
 push constant 0
 gt
 not
@@ -351,13 +330,13 @@ push pointer 0
 push local 2
 push local 0
 push local 1
-push static 4
+push static 3
 call Game.setBoard 5
 pop temp 0
-push local 8
+push local 7
 push constant 1
 sub
-pop local 8
+pop local 7
 goto WHILE_EXP2
 label WHILE_END2
 push local 0
@@ -389,7 +368,7 @@ push local 1
 eq
 and
 not
-pop local 10
+pop local 9
 push local 0
 pop this 8
 push local 1
@@ -410,16 +389,16 @@ pop temp 0
 push this 10
 call Output.printInt 1
 pop temp 0
-push local 10
-if-goto IF_TRUE6
-goto IF_FALSE6
-label IF_TRUE6
+push local 9
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
 push this 7
 push constant 1
 add
 pop this 7
-label IF_FALSE6
-push local 10
+label IF_FALSE5
+push local 9
 return
 function Game.generateNewBlock 6
 push argument 0
@@ -455,7 +434,7 @@ push this 6
 add
 pop pointer 1
 push that 0
-push static 3
+push static 2
 eq
 or
 not
@@ -487,7 +466,7 @@ pop local 2
 push local 0
 push this 6
 add
-push static 4
+push static 3
 pop temp 0
 pop pointer 1
 push temp 0
@@ -526,7 +505,7 @@ push pointer 0
 push local 0
 push local 1
 push local 2
-push static 5
+push static 4
 call Game.setBoard 5
 pop temp 0
 push pointer 0
@@ -538,7 +517,7 @@ push pointer 0
 push local 0
 push local 1
 push local 2
-push static 4
+push static 3
 call Game.setBoard 5
 pop temp 0
 label IF_FALSE1
@@ -548,7 +527,7 @@ push pointer 0
 push local 0
 push local 1
 push local 2
-push static 4
+push static 3
 call Game.setBoard 5
 pop temp 0
 label IF_END0
@@ -623,14 +602,14 @@ push this 6
 add
 pop pointer 1
 push that 0
-push static 4
+push static 3
 eq
 push local 3
 push this 6
 add
 pop pointer 1
 push that 0
-push static 5
+push static 4
 eq
 or
 not
@@ -705,14 +684,14 @@ push this 6
 add
 pop pointer 1
 push that 0
-push static 4
+push static 3
 eq
 push local 3
 push this 6
 add
 pop pointer 1
 push that 0
-push static 5
+push static 4
 eq
 or
 not
@@ -880,7 +859,7 @@ push this 6
 add
 pop pointer 1
 push that 0
-push static 4
+push static 3
 eq
 if-goto IF_TRUE7
 goto IF_FALSE7
@@ -889,7 +868,7 @@ push pointer 0
 push local 3
 push local 1
 push local 2
-push static 3
+push static 2
 call Game.setBoard 5
 pop temp 0
 goto IF_END7
@@ -898,7 +877,7 @@ push pointer 0
 push local 3
 push local 1
 push local 2
-push static 3
+push static 2
 call Game.setBoard 5
 pop temp 0
 label IF_END7
@@ -1195,21 +1174,7 @@ add
 push argument 2
 push local 0
 add
-push local 0
-call Screen.drawCircle 3
-pop temp 0
-push constant 0
-call Screen.setColor 1
-pop temp 0
-push argument 1
-push local 0
-add
-push argument 2
-push local 0
-add
-push local 0
 push local 1
-sub
 call Screen.drawCircle 3
 pop temp 0
 label IF_FALSE1
@@ -1224,13 +1189,14 @@ not
 call Screen.setColor 1
 pop temp 0
 push argument 1
-push local 0
+push argument 2
+push argument 1
+push argument 3
 add
 push argument 2
-push local 0
+push argument 3
 add
-push local 1
-call Screen.drawCircle 3
+call Screen.drawRectangle 4
 pop temp 0
 label IF_FALSE2
 push argument 0
@@ -1253,72 +1219,51 @@ push argument 3
 add
 call Screen.drawRectangle 4
 pop temp 0
+push constant 0
+call Screen.setColor 1
+pop temp 0
+push argument 1
+push local 1
+add
+push argument 2
+push local 1
+add
+push argument 1
+push argument 3
+add
+push local 1
+sub
+push argument 2
+push argument 3
+add
+push local 1
+sub
+call Screen.drawRectangle 4
+pop temp 0
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push argument 1
+push argument 2
+push argument 1
+push argument 3
+add
+push argument 2
+push argument 3
+add
+call Screen.drawLine 4
+pop temp 0
+push argument 1
+push argument 3
+add
+push argument 2
+push argument 1
+push argument 2
+push argument 3
+add
+call Screen.drawLine 4
+pop temp 0
 label IF_FALSE3
-push argument 0
-push static 5
-eq
-if-goto IF_TRUE4
-goto IF_FALSE4
-label IF_TRUE4
-push constant 0
-not
-call Screen.setColor 1
-pop temp 0
-push argument 1
-push argument 2
-push argument 1
-push argument 3
-add
-push argument 2
-push argument 3
-add
-call Screen.drawRectangle 4
-pop temp 0
-push constant 0
-call Screen.setColor 1
-pop temp 0
-push argument 1
-push local 1
-add
-push argument 2
-push local 1
-add
-push argument 1
-push argument 3
-add
-push local 1
-sub
-push argument 2
-push argument 3
-add
-push local 1
-sub
-call Screen.drawRectangle 4
-pop temp 0
-push constant 0
-not
-call Screen.setColor 1
-pop temp 0
-push argument 1
-push argument 2
-push argument 1
-push argument 3
-add
-push argument 2
-push argument 3
-add
-call Screen.drawLine 4
-pop temp 0
-push argument 1
-push argument 3
-add
-push argument 2
-push argument 1
-push argument 2
-push argument 3
-add
-call Screen.drawLine 4
-pop temp 0
-label IF_FALSE4
 push constant 0
 return
