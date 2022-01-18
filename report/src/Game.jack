@@ -10,7 +10,7 @@ class Game {
     field int playerY;
     field int totalPoint;
 
-    static int EMPTY_CELL, PLAYER, SP_ITEM, POINT, NORMAL_BLOCK, STABLE_BLOCK;
+    static int EMPTY_CELL, PLAYER, POINT, NORMAL_BLOCK, STABLE_BLOCK;
     // 0 - empty cell
     // 1 - player
     // 2 - a special item
@@ -28,10 +28,9 @@ class Game {
 
         let EMPTY_CELL = 0;
         let PLAYER = 1;
-        let SP_ITEM = 2;
-        let POINT = 3;
-        let NORMAL_BLOCK = 4;
-        let STABLE_BLOCK = 5;
+        let POINT = 2;
+        let NORMAL_BLOCK = 3;
+        let STABLE_BLOCK = 4;
 
         return this;
     }
@@ -55,13 +54,12 @@ class Game {
     method boolean move(int dx, int dy, boolean apply) {
         var int x, y, id;
         var int tx, ty;
-        var int empty, point, sp_item, normal_block;
+        var int empty, point, normal_block;
         var boolean found, moved;
         let x = playerX + dx;
         let y = playerY + dy;
         let empty = 0;
         let point = 0;
-        let sp_item = 0;
         let normal_block = 0;
         let found = false;
         while ((~found) & isInBoard(x, y)) {
@@ -75,9 +73,6 @@ class Game {
                 if (board[id] = POINT) {
                     let point = point + 1;
                 }
-                if (board[id] = SP_ITEM) {
-                    let sp_item = sp_item + 1;
-                }
                 if (board[id] = NORMAL_BLOCK) {
                     let normal_block = normal_block + 1;
                 }
@@ -86,7 +81,7 @@ class Game {
             }
         }
         if (~apply) {
-            return ~((empty + point + sp_item) = 0);
+            return ~((empty + point) = 0);
         }
         // board[x, y] now is out of map or is a stable block
         let tx = x;
@@ -241,7 +236,7 @@ class Game {
         return hasBingo;
     }
 
-    // TODO: method void trigger_item;
+    // method void trigger_item;
 
     method void init() {
         var int i, pos;
@@ -304,12 +299,6 @@ class Game {
         if (type = PLAYER) {
             do Screen.setColor(true);
             do Screen.drawCircle(x + r, y + r, r);
-        }
-        if (type = SP_ITEM) {
-            do Screen.setColor(true);
-            do Screen.drawCircle(x + r, y + r, r);
-            do Screen.setColor(false);
-            do Screen.drawCircle(x + r, y + r, r - w);
         }
         if (type = POINT) {
             do Screen.setColor(true);
