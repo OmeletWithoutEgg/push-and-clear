@@ -13,10 +13,9 @@ class Game {
     static int EMPTY_CELL, PLAYER, POINT, NORMAL_BLOCK, STABLE_BLOCK;
     // 0 - empty cell
     // 1 - player
-    // 2 - a special item
-    // 3 - a point
-    // 4 - a normal block
-    // 5 - a stable block
+    // 2 - a point
+    // 3 - a normal block
+    // 4 - a stable block
     constructor Game new(int N_) {
         let N = N_;
         let board = Array.new(N * N);
@@ -227,7 +226,6 @@ class Game {
                     do setBoard(id, i, j, POINT);
                 } else {
                     do setBoard(id, i, j, POINT);
-                    // let board[id] = SP_ITEM;
                 }
             }
             let id = id + 1;

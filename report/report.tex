@@ -193,13 +193,12 @@ field int playerX;
 field int playerY;
 field int totalPoint;
 
-static int EMPTY_CELL, PLAYER, SP_ITEM, POINT, NORMAL_BLOCK, STABLE_BLOCK;
+static int EMPTY_CELL, PLAYER, POINT, NORMAL_BLOCK, STABLE_BLOCK;
 // 0 - empty cell
 // 1 - player
-// 2 - a special item
-// 3 - a point
-// 4 - a normal block
-// 5 - a stable block
+// 2 - a point
+// 3 - a normal block
+// 4 - a stable block
 constructor Game new(int N_) {
     let N = N_;
     let board = Array.new(N * N);
@@ -211,10 +210,9 @@ constructor Game new(int N_) {
 
     let EMPTY_CELL = 0;
     let PLAYER = 1;
-    let SP_ITEM = 2;
-    let POINT = 3;
-    let NORMAL_BLOCK = 4;
-    let STABLE_BLOCK = 5;
+    let POINT = 2;
+    let NORMAL_BLOCK = 3;
+    let STABLE_BLOCK = 4;
 
     return this;
 }
@@ -253,13 +251,12 @@ method void setBoard(int id, int x, int y, int type) {
 method boolean move(int dx, int dy, boolean apply) {
     var int x, y, id;
     var int tx, ty;
-    var int empty, point, sp_item, normal_block;
+    var int empty, point, normal_block;
     var boolean found, moved;
     let x = playerX + dx;
     let y = playerY + dy;
     let empty = 0;
     let point = 0;
-    let sp_item = 0;
     let normal_block = 0;
     let found = false;
     while ((~found) & isInBoard(x, y)) {
@@ -273,9 +270,6 @@ method boolean move(int dx, int dy, boolean apply) {
             if (board[id] = POINT) {
                 let point = point + 1;
             }
-            if (board[id] = SP_ITEM) {
-                let sp_item = sp_item + 1;
-            }
             if (board[id] = NORMAL_BLOCK) {
                 let normal_block = normal_block + 1;
             }
@@ -284,7 +278,7 @@ method boolean move(int dx, int dy, boolean apply) {
         }
     }
     if (~apply) {
-        return ~((empty + point + sp_item) = 0);
+        return ~((empty + point) = 0);
     }
     // board[x, y] now is out of map or is a stable block
     let tx = x;
@@ -407,7 +401,6 @@ method boolean elimination(bool apply) {
                 do setBoard(id, i, j, POINT);
             } else {
                 do setBoard(id, i, j, POINT);
-                // let board[id] = SP_ITEM;
             }
         }
         let id = id + 1;

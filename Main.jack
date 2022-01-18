@@ -49,12 +49,6 @@ class Main {
         do game.draw();
         do Output.moveCursor(0, 25);
         do Output.printString("game over!");
-        // while (userCanMove()) {
-        //     printBoard();
-        //     waitNextStep();
-        //     performNextStep();
-        //     generateBlock();
-        // }
 
         do game.dispose();
         return;
