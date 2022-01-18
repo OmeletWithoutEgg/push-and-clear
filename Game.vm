@@ -529,6 +529,19 @@ push local 2
 push static 5
 call Game.setBoard 5
 pop temp 0
+push pointer 0
+call Game.ended 1
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push pointer 0
+push local 0
+push local 1
+push local 2
+push static 4
+call Game.setBoard 5
+pop temp 0
+label IF_FALSE1
 goto IF_END0
 label IF_FALSE0
 push pointer 0
